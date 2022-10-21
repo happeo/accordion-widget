@@ -1,11 +1,12 @@
 {
   "name": "happeoaccordionwidget",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Accordion widget for Happeo pages",
   "main": "index.js",
   "scripts": {
     "build": "webpack --env production",
-    "start": "webpack serve --env development"
+    "start": "webpack serve --env development",
+    "build:ci": "webpack --env production & webpack --env preprod & webpack --env staging && echo '\n\n🧱🚧🏗️👷👷‍♀️🧑‍🏭🛠️🔩⚒️🔨 Build Success!!\n\n'"
   },
   "author": "",
   "license": "ISC",
