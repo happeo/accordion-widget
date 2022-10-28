@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - run: npm run build:ci --if-present
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v3
