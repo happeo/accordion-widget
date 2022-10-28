@@ -11,7 +11,7 @@ class happeoCustomReactWidget extends HTMLElement {
     );
   }
 }
-const slug = "slug-here";
+const slug = process.env.slug;
 
 window.customElements.get(slug) ||
   window.customElements.define(slug, happeoCustomReactWidget);
