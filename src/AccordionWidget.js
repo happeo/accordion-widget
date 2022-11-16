@@ -106,7 +106,7 @@ const AccordionWidget = ({ id, editMode }) => {
       const parsedContent = parseStringJSON(widgetContent, []);
       const dividedContent = divideDataIntoRows(parsedContent);
       const context = await api.getContext();
-      setPageId(context.location?.pageId);
+      setPageId(context?.location?.pageId);
       setItems(dividedContent);
       setWidgetApi(api);
       setInitialized(true);
