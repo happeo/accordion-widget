@@ -17,9 +17,20 @@ import { ButtonSecondary, IconButton } from "@happeouikit/buttons";
 import { gray08, gray09 } from "@happeouikit/colors";
 import { ContentRenderer } from "@happeouikit/content-renderer";
 import { WIDGET_SETTINGS } from "./constants";
-import { divideDataIntoRows, parseStringJSON } from "./utils";
+import {
+  divideDataIntoRows,
+  parseStringJSON,
+  getContentFromFroala,
+} from "./utils";
 
-const EditRow = ({ item, settings, index, onItemUpdated, removeRow }) => (
+const EditRow = ({
+  item,
+  settings,
+  index,
+  onItemUpdated,
+  removeRow,
+  pageId,
+}) => (
   <>
     <EditableAccordionTitle
       style={{ backgroundColor: settings?.headerBackgroundColor }}
@@ -35,6 +46,10 @@ const EditRow = ({ item, settings, index, onItemUpdated, removeRow }) => (
         placeholder="Add title"
         content={item[0]}
         onContentChanged={onItemUpdated}
+        imageUploadLocation={{
+          name: "page",
+          id: pageId,
+        }}
       />
       <IconButton
         icon={IconDelete}
@@ -55,6 +70,10 @@ const EditRow = ({ item, settings, index, onItemUpdated, removeRow }) => (
         placeholder="Add content"
         content={item[1]}
         onContentChanged={onItemUpdated}
+        imageUploadLocation={{
+          name: "page",
+          id: pageId,
+        }}
       />
     </EditableAccordionContent>
   </>
@@ -66,6 +85,7 @@ const AccordionWidget = ({ id, editMode }) => {
   const [items, setItems] = useState([]);
   const [settings, setSettings] = useState({});
   const [widgetApi, setWidgetApi] = useState();
+  const [pageId, setPageId] = useState();
 
   useEffect(() => {
     const doInit = async () => {
@@ -85,6 +105,8 @@ const AccordionWidget = ({ id, editMode }) => {
       const widgetContent = await api.getContent();
       const parsedContent = parseStringJSON(widgetContent, []);
       const dividedContent = divideDataIntoRows(parsedContent);
+      const context = await api.getContext();
+      setPageId(context?.location?.pageId);
       setItems(dividedContent);
       setWidgetApi(api);
       setInitialized(true);
@@ -98,25 +120,22 @@ const AccordionWidget = ({ id, editMode }) => {
 
   const onItemUpdated = debounce(
     () => {
-      const data = [];
       /**
        * Instead of saving this data to state, we just want to loop through the editors.
        * This prevents the editors themselves re-rendering as that causes caret position
        * jumping and loosing of the undo-stack
        */
-      editRef.current.querySelectorAll(`.fr-element`).forEach((el) => {
-        data.push(el.getContent());
-      });
+      const data = getContentFromFroala(editRef.current);
       widgetApi.setContent(JSON.stringify(data));
-      setItems(divideDataIntoRows(data));
     },
     200,
     { leading: false, trailing: true },
   );
 
   const removeRow = (index) => {
-    onItemUpdated();
-    setItems((prevItems) => prevItems.filter((_, i) => i !== index));
+    const data = getContentFromFroala(editRef.current);
+    const items = divideDataIntoRows(data);
+    setItems(items.filter((_, i) => i !== index));
   };
 
   const addRow = () => {
@@ -127,7 +146,6 @@ const AccordionWidget = ({ id, editMode }) => {
     // We don't want to show any loaders
     return null;
   }
-
   return (
     <Container>
       {/* className "custom-font-styles" targets pages custom styles to the components below */}
@@ -143,6 +161,7 @@ const AccordionWidget = ({ id, editMode }) => {
                   onItemUpdated={onItemUpdated}
                   removeRow={removeRow}
                   settings={settings}
+                  pageId={pageId}
                 />
               ))}
             </div>

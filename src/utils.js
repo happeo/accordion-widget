@@ -21,3 +21,11 @@ export const divideDataIntoRows = (data = []) =>
 
     return resultArray;
   }, []);
+
+export const getContentFromFroala = (element) => {
+  const data = [];
+  element.querySelectorAll(`.fr-element`).forEach((el) => {
+    data.push(el.getContent());
+  });
+  return data;
+};
