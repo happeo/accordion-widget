@@ -16,11 +16,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Build Production
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
+      - run: ./bin/setup-npm
+      - run: npm i @happeouikit/content-renderer
       - run: npm ci --legacy-peer-deps
       - run: npm run build:ci --if-present
       - name: "Upload Artifact"
