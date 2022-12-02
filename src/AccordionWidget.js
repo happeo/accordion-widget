@@ -127,6 +127,7 @@ const AccordionWidget = ({ id, editMode }) => {
        */
       const data = getContentFromFroala(editRef.current);
       widgetApi.setContent(JSON.stringify(data));
+      setItems(divideDataIntoRows(data));
     },
     200,
     { leading: false, trailing: true },
@@ -136,6 +137,7 @@ const AccordionWidget = ({ id, editMode }) => {
     const data = getContentFromFroala(editRef.current);
     const items = divideDataIntoRows(data);
     setItems(items.filter((_, i) => i !== index));
+    onItemUpdated();
   };
 
   const addRow = () => {
