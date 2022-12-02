@@ -17,15 +17,25 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Authenticate npm
+        run: ./bin/setup-npm.sh
+        shell: bash
+
       - name: Build Production
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: ./bin/setup-npm
       - run: npm i @happeouikit/content-renderer
       - run: npm ci --legacy-peer-deps
       - run: npm run build:ci --if-present
+
+      - name: Cypress tests
+        uses: cypress-io/github-action@v4.1.0
+        with:
+          start: npm run dev
+          wait-on: "http://localhost:8080"
+
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v3
         with:
