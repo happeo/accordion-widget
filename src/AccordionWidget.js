@@ -149,7 +149,6 @@ const AccordionWidget = ({ id, editMode }) => {
     if (editMode && editRef.current) {
       const data = getContentFromFroala(editRef.current);
       widgetApi.setContent(JSON.stringify(data));
-      console.log("Set content: ", data)
     }
   }, [items]);
 
