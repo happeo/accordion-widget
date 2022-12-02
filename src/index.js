@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from 'react-dom';
 import AccordionWidget from "./AccordionWidget";
 
 class happeoCustomReactWidget extends HTMLElement {
