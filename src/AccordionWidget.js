@@ -123,26 +123,35 @@ const AccordionWidget = ({ id, editMode }) => {
       /**
        * Instead of saving this data to state, we just want to loop through the editors.
        * This prevents the editors themselves re-rendering as that causes caret position
-       * jumping and loosing of the undo-stack
+       * jumping and loosing of the undo-stack.
+       * 
+       * NOTE: this means that "items" array is out of sync during editing but that is OK since we do a
+       * getContent and then setItems when the editMode changes, thus keeping them in sync
        */
       const data = getContentFromFroala(editRef.current);
       widgetApi.setContent(JSON.stringify(data));
-      setItems(divideDataIntoRows(data));
     },
     200,
     { leading: false, trailing: true },
   );
 
   const removeRow = (index) => {
-    const data = getContentFromFroala(editRef.current);
-    const items = divideDataIntoRows(data);
-    widgetApi.setContent(JSON.stringify(data));
     setItems(items.filter((_, i) => i !== index));
   };
 
   const addRow = () => {
     setItems((prevItems) => [...prevItems, ["", ""]]);
   };
+
+  useEffect(() => {
+    // we need to keep widget content in sync when items
+    // are added or removed during editing
+    if (editMode && editRef.current) {
+      const data = getContentFromFroala(editRef.current);
+      widgetApi.setContent(JSON.stringify(data));
+      console.log("Set content: ", data)
+    }
+  }, [items]);
 
   if (!initialized) {
     // We don't want to show any loaders
