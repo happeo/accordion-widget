@@ -174,7 +174,9 @@ const AccordionWidget = ({ id, editMode }) => {
           >
             {items.map((item, index) => (
               <AccordionItem key={index}>
-                <AccordionItemHeading>
+                <AccordionItemHeading
+                  data-testid={`accordion-${index}-${id}-header`}
+                >
                   <AccordionItemButton
                     style={{ backgroundColor: settings?.headerBackgroundColor }}
                   >
@@ -193,7 +195,10 @@ const AccordionWidget = ({ id, editMode }) => {
                 <AccordionItemPanel
                   style={{ backgroundColor: settings?.contentBackgroundColor }}
                 >
-                  <div className="fr-view">
+                  <div
+                    className="fr-view"
+                    data-testid={`accordion-${index}-${id}-content`}
+                  >
                     <ContentRenderer content={item[1]} type="html" />
                   </div>
                 </AccordionItemPanel>
