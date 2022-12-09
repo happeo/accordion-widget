@@ -1,6 +1,6 @@
 {
   "name": "happeoaccordionwidget",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Accordion widget for Happeo pages",
   "main": "index.js",
   "scripts": {
