@@ -124,7 +124,7 @@ const AccordionWidget = ({ id, editMode }) => {
        * Instead of saving this data to state, we just want to loop through the editors.
        * This prevents the editors themselves re-rendering as that causes caret position
        * jumping and loosing of the undo-stack.
-       * 
+       *
        * NOTE: this means that "items" array is out of sync during editing but that is OK since we do a
        * getContent and then setItems when the editMode changes, thus keeping them in sync
        */
@@ -157,70 +157,76 @@ const AccordionWidget = ({ id, editMode }) => {
     return null;
   }
   return (
-    <Container>
-      {/* className "custom-font-styles" targets pages custom styles to the components below */}
-      <div className="custom-font-styles">
-        {editMode ? (
-          <widgetSDK.uikit.ProviderWrapper>
-            <div ref={editRef}>
+    <widgetSDK.uikit.ProviderWrapper>
+      <Container>
+        {/* className "custom-font-styles" targets pages custom styles to the components below */}
+        <div className="custom-font-styles">
+          {editMode ? (
+            <widgetSDK.uikit.ProviderWrapper>
+              <div ref={editRef}>
+                {items.map((item, index) => (
+                  <EditRow
+                    key={index}
+                    item={item}
+                    index={index}
+                    onItemUpdated={onItemUpdated}
+                    removeRow={removeRow}
+                    settings={settings}
+                    pageId={pageId}
+                  />
+                ))}
+              </div>
+            </widgetSDK.uikit.ProviderWrapper>
+          ) : (
+            <Accordion
+              allowMultipleExpanded
+              allowZeroExpanded
+              settings={settings}
+            >
               {items.map((item, index) => (
-                <EditRow
-                  key={index}
-                  item={item}
-                  index={index}
-                  onItemUpdated={onItemUpdated}
-                  removeRow={removeRow}
-                  settings={settings}
-                  pageId={pageId}
-                />
-              ))}
-            </div>
-          </widgetSDK.uikit.ProviderWrapper>
-        ) : (
-          <Accordion
-            allowMultipleExpanded
-            allowZeroExpanded
-            settings={settings}
-          >
-            {items.map((item, index) => (
-              <AccordionItem key={index}>
-                <AccordionItemHeading>
-                  <AccordionItemButton
-                    style={{ backgroundColor: settings?.headerBackgroundColor }}
-                  >
-                    <IconChevronRight
-                      className="accordion__icon--expand"
-                      width={24}
-                      height={24}
-                      style={{ marginRight: margin300, flexShrink: 0 }}
-                    />
+                <AccordionItem key={index}>
+                  <AccordionItemHeading>
+                    <AccordionItemButton
+                      style={{
+                        backgroundColor: settings?.headerBackgroundColor,
+                      }}
+                    >
+                      <IconChevronRight
+                        className="accordion__icon--expand"
+                        width={24}
+                        height={24}
+                        style={{ marginRight: margin300, flexShrink: 0 }}
+                      />
 
-                    <div className="fr-view">
-                      <ContentRenderer content={item[0]} type="html" />
+                      <div className="custom-font-styles fr-view pages-text">
+                        <ContentRenderer content={item[0]} type="html" />
+                      </div>
+                    </AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel
+                    style={{
+                      backgroundColor: settings?.contentBackgroundColor,
+                    }}
+                  >
+                    <div className="custom-font-styles fr-view pages-text">
+                      <ContentRenderer content={item[1]} type="html" />
                     </div>
-                  </AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel
-                  style={{ backgroundColor: settings?.contentBackgroundColor }}
-                >
-                  <div className="fr-view">
-                    <ContentRenderer content={item[1]} type="html" />
-                  </div>
-                </AccordionItemPanel>
-              </AccordionItem>
-            ))}
-          </Accordion>
+                  </AccordionItemPanel>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          )}
+        </div>
+        {editMode && (
+          <ButtonSecondary
+            style={{ marginTop: margin200 }}
+            text="New item"
+            icon={IconAdd}
+            onClick={addRow}
+          />
         )}
-      </div>
-      {editMode && (
-        <ButtonSecondary
-          style={{ marginTop: margin200 }}
-          text="New item"
-          icon={IconAdd}
-          onClick={addRow}
-        />
-      )}
-    </Container>
+      </Container>
+    </widgetSDK.uikit.ProviderWrapper>
   );
 };
 
