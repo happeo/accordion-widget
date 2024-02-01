@@ -29,3 +29,8 @@ export const getContentFromFroala = (element) => {
   });
   return data;
 };
+
+export const getContentFromFroalaInstance = (element, index1, index2) => {
+  const el = element.querySelectorAll(`.fr-element`)[index1 * 2 + index2];
+  return el.getContent();
+};

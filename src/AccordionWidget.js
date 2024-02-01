@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import styled from "styled-components";
-import debounce from "lodash.debounce";
 import widgetSDK from "@happeo/widget-sdk";
 import {
   Accordion,
@@ -21,6 +20,7 @@ import {
   divideDataIntoRows,
   parseStringJSON,
   getContentFromFroala,
+  getContentFromFroalaInstance,
 } from "./utils";
 
 const EditRow = ({
@@ -45,7 +45,7 @@ const EditRow = ({
         type="full"
         placeholder="Add title"
         content={item[0]}
-        onContentChanged={onItemUpdated}
+        onContentChanged={() => onItemUpdated(index, 0)}
         imageUploadLocation={{
           name: "page",
           id: pageId,
@@ -69,7 +69,7 @@ const EditRow = ({
         type="full"
         placeholder="Add content"
         content={item[1]}
-        onContentChanged={onItemUpdated}
+        onContentChanged={() => onItemUpdated(index, 1)}
         imageUploadLocation={{
           name: "page",
           id: pageId,
@@ -118,30 +118,30 @@ const AccordionWidget = ({ id, editMode }) => {
     doInit();
   }, [editMode, id]);
 
-  const onItemUpdated = debounce(
-    () => {
-      /**
-       * Instead of saving this data to state, we just want to loop through the editors.
-       * This prevents the editors themselves re-rendering as that causes caret position
-       * jumping and loosing of the undo-stack.
-       *
-       * NOTE: this means that "items" array is out of sync during editing but that is OK since we do a
-       * getContent and then setItems when the editMode changes, thus keeping them in sync
-       */
-      const data = getContentFromFroala(editRef.current);
-      widgetApi.setContent(JSON.stringify(data));
-    },
-    200,
-    { leading: false, trailing: true },
-  );
+  const onItemUpdated = useCallback((rowIndex, indexInRow) => {
+    setItems((oldItems) =>
+      oldItems.map((item, i) => {
+        if (i !== rowIndex) {
+          return item;
+        }
+        const newItem = [...item];
+        newItem[indexInRow] = getContentFromFroalaInstance(
+          editRef.current,
+          rowIndex,
+          indexInRow
+        );
+        return newItem;
+      })
+    );
+  }, []);
 
-  const removeRow = (index) => {
-    setItems(items.filter((_, i) => i !== index));
-  };
+  const removeRow = useCallback((rowIndex) => {
+    setItems((oldItems) => oldItems.filter((_, i) => i !== rowIndex));
+  }, []);
 
-  const addRow = () => {
+  const addRow = useCallback(() => {
     setItems((prevItems) => [...prevItems, ["", ""]]);
-  };
+  }, []);
 
   useEffect(() => {
     // we need to keep widget content in sync when items
