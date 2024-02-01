@@ -30,7 +30,7 @@ export const getContentFromFroala = (element) => {
   return data;
 };
 
-export const getContentFromFroalaInstance = (element, index1, index2) => {
-  const el = element.querySelectorAll(`.fr-element`)[index1 * 2 + index2];
+export const getContentFromFroalaInstance = (element, rowIndex, indexInRow) => {
+  const el = element.querySelectorAll(`.fr-element`)[rowIndex * 2 + indexInRow];
   return el.getContent();
 };
