@@ -31,6 +31,7 @@ const EditRow = ({
   removeRow,
   pageId,
 }) => {
+  const [initialTitle] = useState(item[0]);
   const [initialContent] = useState(item[1]);
   return (
     <>
@@ -46,7 +47,7 @@ const EditRow = ({
         <widgetSDK.uikit.RichTextEditor
           type="full"
           placeholder="Add title"
-          content={item[0]}
+          content={initialTitle}
           onContentChanged={() => onItemUpdated(index, 0)}
           imageUploadLocation={{
             name: "page",
@@ -55,7 +56,7 @@ const EditRow = ({
         />
         <IconButton
           icon={IconDelete}
-          onMouseDown={() => removeRow(index)}
+          onMouseDown={() => removeRow(item[2])}
           type="alert"
           isActionIcon
           aria-label="Remove row"
@@ -138,12 +139,17 @@ const AccordionWidget = ({ id, editMode }) => {
     );
   }, []);
 
-  const removeRow = useCallback((rowIndex) => {
-    setItems((oldItems) => oldItems.filter((_, i) => i !== rowIndex));
+  const removeRow = useCallback((rowId) => {
+    setItems((oldItems) => oldItems.filter((oldItem) => oldItem[2] !== rowId));
   }, []);
 
   const addRow = useCallback(() => {
-    setItems((prevItems) => [...prevItems, ["", ""]]);
+    setItems((prevItems) => [
+      ...prevItems,
+      // we cannot rely on list element indexes when removing elements from a list
+      // so we need to add a unique key for each item
+      ["", "", (Math.random() + 1).toString(36).substring(7)],
+    ]);
   }, []);
 
   useEffect(() => {
@@ -169,7 +175,7 @@ const AccordionWidget = ({ id, editMode }) => {
               <div ref={editRef}>
                 {items.map((item, index) => (
                   <EditRow
-                    key={index}
+                    key={item[2]}
                     item={item}
                     index={index}
                     onItemUpdated={onItemUpdated}
