@@ -140,7 +140,9 @@ const AccordionWidget = ({ id, editMode }) => {
   }, []);
 
   const removeRow = useCallback((rowId) => {
-    setItems((oldItems) => oldItems.filter((oldItem) => oldItem[2] !== rowId));
+    setItems((oldItems) =>
+      oldItems.filter(([title, content, id]) => id !== rowId)
+    );
   }, []);
 
   const addRow = useCallback(() => {
@@ -175,7 +177,7 @@ const AccordionWidget = ({ id, editMode }) => {
               <div ref={editRef}>
                 {items.map((item, index) => (
                   <EditRow
-                    key={item[2]}
+                    key={item[2]} // unique key associated to each item
                     item={item}
                     index={index}
                     onItemUpdated={onItemUpdated}
