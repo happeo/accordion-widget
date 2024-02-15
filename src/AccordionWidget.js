@@ -30,54 +30,58 @@ const EditRow = ({
   onItemUpdated,
   removeRow,
   pageId,
-}) => (
-  <>
-    <EditableAccordionTitle
-      style={{ backgroundColor: settings?.headerBackgroundColor }}
-    >
-      <IconChevronRight
-        className="accordion__icon--expand"
-        width={24}
-        height={24}
-        style={{ marginRight: margin300, flexShrink: 0 }}
-      />
-      <widgetSDK.uikit.RichTextEditor
-        type="full"
-        placeholder="Add title"
-        content={item[0]}
-        onContentChanged={() => onItemUpdated(index, 0)}
-        imageUploadLocation={{
-          name: "page",
-          id: pageId,
-        }}
-      />
-      <IconButton
-        icon={IconDelete}
-        onMouseDown={() => removeRow(index)}
-        type="alert"
-        isActionIcon
-        aria-label="Remove row"
-        data-tip={"Remove row"}
-        data-for={`${index}-tooltip`}
-      />
-      <Tooltip id={`${index}-tooltip`} />
-    </EditableAccordionTitle>
-    <EditableAccordionContent
-      style={{ backgroundColor: settings?.contentBackgroundColor }}
-    >
-      <widgetSDK.uikit.RichTextEditor
-        type="full"
-        placeholder="Add content"
-        content={item[1]}
-        onContentChanged={() => onItemUpdated(index, 1)}
-        imageUploadLocation={{
-          name: "page",
-          id: pageId,
-        }}
-      />
-    </EditableAccordionContent>
-  </>
-);
+}) => {
+  const [initialTitle] = useState(item[0]);
+  const [initialContent] = useState(item[1]);
+  return (
+    <>
+      <EditableAccordionTitle
+        style={{ backgroundColor: settings?.headerBackgroundColor }}
+      >
+        <IconChevronRight
+          className="accordion__icon--expand"
+          width={24}
+          height={24}
+          style={{ marginRight: margin300, flexShrink: 0 }}
+        />
+        <widgetSDK.uikit.RichTextEditor
+          type="full"
+          placeholder="Add title"
+          content={initialTitle}
+          onContentChanged={() => onItemUpdated(index, 0)}
+          imageUploadLocation={{
+            name: "page",
+            id: pageId,
+          }}
+        />
+        <IconButton
+          icon={IconDelete}
+          onMouseDown={() => removeRow(item[2])}
+          type="alert"
+          isActionIcon
+          aria-label="Remove row"
+          data-tip={"Remove row"}
+          data-for={`${index}-tooltip`}
+        />
+        <Tooltip id={`${index}-tooltip`} />
+      </EditableAccordionTitle>
+      <EditableAccordionContent
+        style={{ backgroundColor: settings?.contentBackgroundColor }}
+      >
+        <widgetSDK.uikit.RichTextEditor
+          type="full"
+          placeholder="Add content"
+          content={initialContent}
+          onContentChanged={() => onItemUpdated(index, 1)}
+          imageUploadLocation={{
+            name: "page",
+            id: pageId,
+          }}
+        />
+      </EditableAccordionContent>
+    </>
+  );
+};
 
 const AccordionWidget = ({ id, editMode }) => {
   const editRef = useRef();
@@ -135,12 +139,19 @@ const AccordionWidget = ({ id, editMode }) => {
     );
   }, []);
 
-  const removeRow = useCallback((rowIndex) => {
-    setItems((oldItems) => oldItems.filter((_, i) => i !== rowIndex));
+  const removeRow = useCallback((rowId) => {
+    setItems((oldItems) =>
+      oldItems.filter(([title, content, id]) => id !== rowId)
+    );
   }, []);
 
   const addRow = useCallback(() => {
-    setItems((prevItems) => [...prevItems, ["", ""]]);
+    setItems((prevItems) => [
+      ...prevItems,
+      // we cannot rely on list element indexes when removing elements from a list
+      // so we need to add a unique key for each item
+      ["", "", (Math.random() + 1).toString(36).substring(7)],
+    ]);
   }, []);
 
   useEffect(() => {
@@ -166,7 +177,7 @@ const AccordionWidget = ({ id, editMode }) => {
               <div ref={editRef}>
                 {items.map((item, index) => (
                   <EditRow
-                    key={index}
+                    key={item[2]} // unique key associated to each item
                     item={item}
                     index={index}
                     onItemUpdated={onItemUpdated}
