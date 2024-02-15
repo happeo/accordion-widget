@@ -30,54 +30,57 @@ const EditRow = ({
   onItemUpdated,
   removeRow,
   pageId,
-}) => (
-  <>
-    <EditableAccordionTitle
-      style={{ backgroundColor: settings?.headerBackgroundColor }}
-    >
-      <IconChevronRight
-        className="accordion__icon--expand"
-        width={24}
-        height={24}
-        style={{ marginRight: margin300, flexShrink: 0 }}
-      />
-      <widgetSDK.uikit.RichTextEditor
-        type="full"
-        placeholder="Add title"
-        content={item[0]}
-        onContentChanged={() => onItemUpdated(index, 0)}
-        imageUploadLocation={{
-          name: "page",
-          id: pageId,
-        }}
-      />
-      <IconButton
-        icon={IconDelete}
-        onMouseDown={() => removeRow(index)}
-        type="alert"
-        isActionIcon
-        aria-label="Remove row"
-        data-tip={"Remove row"}
-        data-for={`${index}-tooltip`}
-      />
-      <Tooltip id={`${index}-tooltip`} />
-    </EditableAccordionTitle>
-    <EditableAccordionContent
-      style={{ backgroundColor: settings?.contentBackgroundColor }}
-    >
-      <widgetSDK.uikit.RichTextEditor
-        type="full"
-        placeholder="Add content"
-        content={item[1]}
-        onContentChanged={() => onItemUpdated(index, 1)}
-        imageUploadLocation={{
-          name: "page",
-          id: pageId,
-        }}
-      />
-    </EditableAccordionContent>
-  </>
-);
+}) => {
+  const [initialContent] = useState(item[1]);
+  return (
+    <>
+      <EditableAccordionTitle
+        style={{ backgroundColor: settings?.headerBackgroundColor }}
+      >
+        <IconChevronRight
+          className="accordion__icon--expand"
+          width={24}
+          height={24}
+          style={{ marginRight: margin300, flexShrink: 0 }}
+        />
+        <widgetSDK.uikit.RichTextEditor
+          type="full"
+          placeholder="Add title"
+          content={item[0]}
+          onContentChanged={() => onItemUpdated(index, 0)}
+          imageUploadLocation={{
+            name: "page",
+            id: pageId,
+          }}
+        />
+        <IconButton
+          icon={IconDelete}
+          onMouseDown={() => removeRow(index)}
+          type="alert"
+          isActionIcon
+          aria-label="Remove row"
+          data-tip={"Remove row"}
+          data-for={`${index}-tooltip`}
+        />
+        <Tooltip id={`${index}-tooltip`} />
+      </EditableAccordionTitle>
+      <EditableAccordionContent
+        style={{ backgroundColor: settings?.contentBackgroundColor }}
+      >
+        <widgetSDK.uikit.RichTextEditor
+          type="full"
+          placeholder="Add content"
+          content={initialContent}
+          onContentChanged={() => onItemUpdated(index, 1)}
+          imageUploadLocation={{
+            name: "page",
+            id: pageId,
+          }}
+        />
+      </EditableAccordionContent>
+    </>
+  );
+};
 
 const AccordionWidget = ({ id, editMode }) => {
   const editRef = useRef();
