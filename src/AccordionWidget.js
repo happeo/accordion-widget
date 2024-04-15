@@ -21,6 +21,8 @@ import {
   parseStringJSON,
   getContentFromFroala,
   getContentFromFroalaInstance,
+  isInIframe,
+  replaceExternalLinkTargets,
 } from "./utils";
 
 const EditRow = ({
@@ -132,16 +134,16 @@ const AccordionWidget = ({ id, editMode }) => {
         newItem[indexInRow] = getContentFromFroalaInstance(
           editRef.current,
           rowIndex,
-          indexInRow
+          indexInRow,
         );
         return newItem;
-      })
+      }),
     );
   }, []);
 
   const removeRow = useCallback((rowId) => {
     setItems((oldItems) =>
-      oldItems.filter(([title, content, id]) => id !== rowId)
+      oldItems.filter(([title, content, id]) => id !== rowId),
     );
   }, []);
 
@@ -210,7 +212,14 @@ const AccordionWidget = ({ id, editMode }) => {
                       />
 
                       <div className="custom-font-styles fr-view pages-text">
-                        <ContentRenderer content={item[0]} type="html" />
+                        <ContentRenderer
+                          content={
+                            isInIframe()
+                              ? replaceExternalLinkTargets(item[0])
+                              : item[0]
+                          }
+                          type="html"
+                        />
                       </div>
                     </AccordionItemButton>
                   </AccordionItemHeading>
@@ -220,7 +229,14 @@ const AccordionWidget = ({ id, editMode }) => {
                     }}
                   >
                     <div className="custom-font-styles fr-view pages-text">
-                      <ContentRenderer content={item[1]} type="html" />
+                      <ContentRenderer
+                        content={
+                          isInIframe()
+                            ? replaceExternalLinkTargets(item[1])
+                            : item[1]
+                        }
+                        type="html"
+                      />
                     </div>
                   </AccordionItemPanel>
                 </AccordionItem>
