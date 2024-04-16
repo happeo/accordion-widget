@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import styled from "styled-components";
 import widgetSDK from "@happeo/widget-sdk";
 import {
@@ -165,10 +171,21 @@ const AccordionWidget = ({ id, editMode }) => {
     }
   }, [items]);
 
+  const viewModeItems = useMemo(() => {
+    if (isInIframe() && !editMode) {
+      return items.map((item) => [
+        replaceExternalLinkTargets(item[0]),
+        replaceExternalLinkTargets(item[1]),
+      ]);
+    }
+    return items;
+  }, [items]);
+
   if (!initialized) {
     // We don't want to show any loaders
     return null;
   }
+
   return (
     <widgetSDK.uikit.ProviderWrapper>
       <Container>
@@ -196,7 +213,7 @@ const AccordionWidget = ({ id, editMode }) => {
               allowZeroExpanded
               settings={settings}
             >
-              {items.map((item, index) => (
+              {viewModeItems.map((item, index) => (
                 <AccordionItem key={index}>
                   <AccordionItemHeading>
                     <AccordionItemButton
@@ -212,14 +229,7 @@ const AccordionWidget = ({ id, editMode }) => {
                       />
 
                       <div className="custom-font-styles fr-view pages-text">
-                        <ContentRenderer
-                          content={
-                            isInIframe()
-                              ? replaceExternalLinkTargets(item[0])
-                              : item[0]
-                          }
-                          type="html"
-                        />
+                        <ContentRenderer content={item[0]} type="html" />
                       </div>
                     </AccordionItemButton>
                   </AccordionItemHeading>
@@ -229,14 +239,7 @@ const AccordionWidget = ({ id, editMode }) => {
                     }}
                   >
                     <div className="custom-font-styles fr-view pages-text">
-                      <ContentRenderer
-                        content={
-                          isInIframe()
-                            ? replaceExternalLinkTargets(item[1])
-                            : item[1]
-                        }
-                        type="html"
-                      />
+                      <ContentRenderer content={item[1]} type="html" />
                     </div>
                   </AccordionItemPanel>
                 </AccordionItem>
