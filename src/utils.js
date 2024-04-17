@@ -36,3 +36,31 @@ export const getContentFromFroalaInstance = (element, rowIndex, indexInRow) => {
   const el = element.querySelectorAll(`.fr-element`)[rowIndex * 2 + indexInRow];
   return el.getContent();
 };
+
+export const isInIframe = () => {
+  return window.self !== window.top;
+};
+
+export const replaceExternalLinkTargets = (htmlContent) => {
+  let parser = new DOMParser();
+  let doc = parser.parseFromString(htmlContent, "text/html");
+
+  let anchors = doc.querySelectorAll("a");
+  anchors.forEach((anchor) => {
+    let href = anchor.getAttribute("href");
+    let url;
+    try {
+      url = new URL(href);
+    } catch (_) {
+      return; // invalid URL, skip this anchor
+    }
+    if (
+      url.hostname !== window.location.hostname &&
+      !anchor.getAttribute("target") // if null or empty string
+    ) {
+      anchor.setAttribute("target", "_top");
+    }
+  });
+
+  return doc.body.innerHTML;
+};

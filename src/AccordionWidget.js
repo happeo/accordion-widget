@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import styled from "styled-components";
 import widgetSDK from "@happeo/widget-sdk";
 import {
@@ -21,6 +27,8 @@ import {
   parseStringJSON,
   getContentFromFroala,
   getContentFromFroalaInstance,
+  isInIframe,
+  replaceExternalLinkTargets,
 } from "./utils";
 
 const EditRow = ({
@@ -132,16 +140,16 @@ const AccordionWidget = ({ id, editMode }) => {
         newItem[indexInRow] = getContentFromFroalaInstance(
           editRef.current,
           rowIndex,
-          indexInRow
+          indexInRow,
         );
         return newItem;
-      })
+      }),
     );
   }, []);
 
   const removeRow = useCallback((rowId) => {
     setItems((oldItems) =>
-      oldItems.filter(([title, content, id]) => id !== rowId)
+      oldItems.filter(([title, content, id]) => id !== rowId),
     );
   }, []);
 
@@ -163,10 +171,21 @@ const AccordionWidget = ({ id, editMode }) => {
     }
   }, [items]);
 
+  const viewModeItems = useMemo(() => {
+    if (isInIframe() && !editMode) {
+      return items.map((item) => [
+        replaceExternalLinkTargets(item[0]),
+        replaceExternalLinkTargets(item[1]),
+      ]);
+    }
+    return items;
+  }, [items]);
+
   if (!initialized) {
     // We don't want to show any loaders
     return null;
   }
+
   return (
     <widgetSDK.uikit.ProviderWrapper>
       <Container>
@@ -194,7 +213,7 @@ const AccordionWidget = ({ id, editMode }) => {
               allowZeroExpanded
               settings={settings}
             >
-              {items.map((item, index) => (
+              {viewModeItems.map((item, index) => (
                 <AccordionItem key={index}>
                   <AccordionItemHeading>
                     <AccordionItemButton
