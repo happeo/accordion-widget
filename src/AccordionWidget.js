@@ -229,7 +229,11 @@ const AccordionWidget = ({ id, editMode }) => {
                       />
 
                       <div className="custom-font-styles fr-view pages-text">
-                        <ContentRenderer content={item[0]} type="html" />
+                        <ContentRenderer
+                          content={item[0]}
+                          type="html"
+                          widgetType="page"
+                        />
                       </div>
                     </AccordionItemButton>
                   </AccordionItemHeading>
@@ -239,7 +243,11 @@ const AccordionWidget = ({ id, editMode }) => {
                     }}
                   >
                     <div className="custom-font-styles fr-view pages-text">
-                      <ContentRenderer content={item[1]} type="html" />
+                      <ContentRenderer
+                        content={item[1]}
+                        type="html"
+                        widgetType="page"
+                      />
                     </div>
                   </AccordionItemPanel>
                 </AccordionItem>
