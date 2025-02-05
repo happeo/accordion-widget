@@ -72,7 +72,6 @@ const serializer = new XMLSerializer();
 // but it is required for Googles new video player
 // NOTE: Hopefully Google would fix their player some day to work without autoplay, so we could remove this
 export const allowAutoplayInIframes = (content) => {
-  console.log("content", content)
   const dom = domParser.parseFromString(content, "text/html");
 
   const iframes = dom.querySelectorAll("iframe");
