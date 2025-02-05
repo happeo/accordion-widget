@@ -100,8 +100,6 @@ const AccordionWidget = ({ id, editMode }) => {
   const [widgetApi, setWidgetApi] = useState();
   const [pageId, setPageId] = useState();
 
-  console.log("AccordionWidget FROM LOCALHOST");
-
   useEffect(() => {
     const doInit = async () => {
       // Init API, use uniqueId for the initialisation as this widget may be present multiple times in a page
