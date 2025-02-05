@@ -30,7 +30,7 @@ jobs:
       - run: npm test
       - run: npm run build:ci --if-present
       - name: "Upload Artifact"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: widget-bundles
           path: dist/
