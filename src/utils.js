@@ -64,3 +64,28 @@ export const replaceExternalLinkTargets = (htmlContent) => {
 
   return doc.body.innerHTML;
 };
+
+const domParser = new DOMParser();
+const serializer = new XMLSerializer();
+
+// This is a workaround when Froala strips autoplay attributes away from embedded iframe videos,
+// but it is required for Googles new video player
+// NOTE: Hopefully Google would fix their player some day to work without autoplay, so we could remove this
+export const allowAutoplayInIframes = (content) => {
+  console.log("content", content)
+  const dom = domParser.parseFromString(content, "text/html");
+
+  const iframes = dom.querySelectorAll("iframe");
+  iframes.forEach((iframe) => {
+    if (iframe.allow?.includes?.("autoplay")) {
+      return;
+    }
+    if (!iframe.allow) {
+      iframe.allow = "autoplay";
+      return;
+    }
+    iframe.allow = iframe.allow + "; autoplay";
+  });
+
+  return serializer.serializeToString(dom);
+}

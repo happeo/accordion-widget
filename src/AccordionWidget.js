@@ -29,6 +29,7 @@ import {
   getContentFromFroalaInstance,
   isInIframe,
   replaceExternalLinkTargets,
+  allowAutoplayInIframes,
 } from "./utils";
 
 const EditRow = ({
@@ -98,6 +99,8 @@ const AccordionWidget = ({ id, editMode }) => {
   const [settings, setSettings] = useState({});
   const [widgetApi, setWidgetApi] = useState();
   const [pageId, setPageId] = useState();
+
+  console.log("AccordionWidget FROM LOCALHOST");
 
   useEffect(() => {
     const doInit = async () => {
@@ -172,13 +175,20 @@ const AccordionWidget = ({ id, editMode }) => {
   }, [items]);
 
   const viewModeItems = useMemo(() => {
-    if (isInIframe() && !editMode) {
-      return items.map((item) => [
+    if (editMode) {
+      return items;
+    }
+    let transformedItems = items;
+    if (isInIframe()) {
+      transformedItems = items.map((item) => [
         replaceExternalLinkTargets(item[0]),
         replaceExternalLinkTargets(item[1]),
       ]);
     }
-    return items;
+    return transformedItems.map((item) => [
+      item[0],
+      allowAutoplayInIframes(item[1]),
+    ]);
   }, [items]);
 
   if (!initialized) {
